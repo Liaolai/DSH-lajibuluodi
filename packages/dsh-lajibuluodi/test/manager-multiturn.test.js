@@ -5,11 +5,15 @@ import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { LajibuluodiManager } from '../src/manager.js'
 import { normalizeOptions } from '../src/options.js'
-import { cleanRecycle, uniqueRoot } from './helpers.js'
+import { canUseRecycleBin, cleanRecycle, uniqueRoot } from './helpers.js'
 
 const maybe = process.platform === 'win32' ? test : test.skip
 
 maybe('manager packages each turn separately and skips empty turns', async t => {
+  if (!(await canUseRecycleBin())) {
+    t.skip('Recycle Bin is unavailable on this host')
+    return
+  }
   const root = uniqueRoot('multiturn-ws')
   const data = uniqueRoot('multiturn-data')
   await fsp.rm(root, { recursive: true, force: true })

@@ -5,12 +5,15 @@ import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { LajibuluodiManager } from '../src/manager.js'
 import { normalizeOptions } from '../src/options.js'
-import { findRecycleEntry } from '../src/recycle.js'
-import { cleanRecycle, uniqueRoot } from './helpers.js'
+import { cleanRecycle, canUseRecycleBin, uniqueRoot, waitForRecycleEntry } from './helpers.js'
 
 const maybe = process.platform === 'win32' ? test : test.skip
 
 maybe('manager packages one turn and restores it', async t => {
+  if (!(await canUseRecycleBin())) {
+    t.skip('Recycle Bin is unavailable on this host')
+    return
+  }
   const root = uniqueRoot('manager-ws')
   const data = uniqueRoot('manager-data')
   await fsp.rm(root, { recursive: true, force: true })
@@ -60,7 +63,7 @@ maybe('manager packages one turn and restores it', async t => {
   assert.equal(record.recycle, 'sent')
   assert.equal(record.fileCount, 2)
   assert.equal(fs.existsSync(record.zipPath), false)
-  const entry = await findRecycleEntry(record.zipPath)
+  const entry = await waitForRecycleEntry(record.zipPath)
   assert.ok(entry, 'recycle entry exists')
   recyclePath = entry
 
