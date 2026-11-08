@@ -26,6 +26,7 @@ export const DEFAULT_EXCLUDES = Object.freeze([
 /** Resolved defaults used by the host and by unit tests. */
 export const DEFAULT_OPTIONS = Object.freeze({
   enabled: true,
+  recycle: true,
   dataDir: '',
   exclude: DEFAULT_EXCLUDES,
   maxFiles: 20_000,
@@ -63,6 +64,7 @@ export function normalizeOptions(raw = {}) {
     }
   }
   if (typeof value.enabled !== 'boolean') throw new TypeError('dsh-lajibuluodi: enabled must be a boolean')
+  if (typeof value.recycle !== 'boolean') throw new TypeError('dsh-lajibuluodi: recycle must be a boolean')
   if (typeof value.dataDir !== 'string') throw new TypeError('dsh-lajibuluodi: dataDir must be a string')
   if (!Array.isArray(value.exclude) || value.exclude.some(item => typeof item !== 'string')) {
     throw new TypeError('dsh-lajibuluodi: exclude must be an array of strings')

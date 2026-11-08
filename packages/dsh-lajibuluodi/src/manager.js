@@ -326,15 +326,17 @@ export class LajibuluodiManager {
         await capture.dispose({ remove: false })
         return
       }
-      let recycle = 'failed'
+      let recycle = this.options.recycle ? 'failed' : 'kept'
       let recycleError
-      try {
-        await sendToRecycleBin(zipPath, 60_000)
-        recycle = 'sent'
-      } catch (error) {
-        recycle = 'failed'
-        recycleError = error.message
-        this.warn('cannot send package to Recycle Bin: ' + error.message)
+      if (this.options.recycle) {
+        try {
+          await sendToRecycleBin(zipPath, 60_000)
+          recycle = 'sent'
+        } catch (error) {
+          recycle = 'failed'
+          recycleError = error.message
+          this.warn('cannot send package to Recycle Bin: ' + error.message)
+        }
       }
       await store.add({
         id: packageId,
@@ -356,6 +358,9 @@ export class LajibuluodiManager {
       await removeStaging(built.packageDir)
       if (recycle === 'sent') {
         this.info('packaged turn ' + turn + ' into ' + path.basename(zipPath) + ' (' + built.included.length + ' files, ' + formatBytes(built.bytes) + ')')
+        await capture.dispose()
+      } else if (recycle === 'kept') {
+        this.info('package kept in outbox for review: ' + zipPath)
         await capture.dispose()
       } else {
         this.warn('package kept in outbox: ' + zipPath)

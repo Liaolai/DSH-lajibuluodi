@@ -85,7 +85,7 @@ $json = $pkg | ConvertTo-Json -Depth 20
 
 ## 使用
 
-插件默认**全自动**，不需要模型调用任何工具。
+插件默认**全自动**，不需要模型调用任何工具。如果希望先审阅再丢弃，把 `recycle` 设为 `false`：包会留在 outbox，不会进回收站；用 `/lajibuluodi list` 查看，确认后手动在资源管理器里删除 ZIP（或直接 `restore`）。
 
 ### 斜杠命令
 
@@ -105,6 +105,13 @@ restore 会：
 4. 默认跳过已存在的文件，--overwrite 才覆盖。
 
 > 在资源管理器里对 ZIP 点“还原”，只会把 ZIP 还原到 outbox；要还原里面的文件，请用上面的命令。
+
+## 兼容性 / 其它 agent
+
+- **DSH 内的其它 agent/session**：插件挂在 host 层，安装到 profile 后对所有顶层 session 自动生效，不需要每个 agent 单独接入。
+- **DSH subagent**：同工作区的删除会并入父轮次的包；插件跳过 subagent 自己的轮次，避免重复打包。如果 subagent 使用**不同的 cwd**（例如独立 worktree），它的删除不会被捕获。
+- **其它 agent 框架**（Claude Code、Codex、WorkBuddy、Cursor 等）：**不能直接用**。它们不产生 DSH 的 turn 事件，本插件也看不到它们的删除；WorkBuddy 已经产生的回收站条目不会被清理。
+- **其它 DSH profile**：每个 profile 单独安装；装上后该 profile 的所有 DSH agent 共享。
 
 ## 配置
 
@@ -127,6 +134,7 @@ restore 会：
 | 配置 | 默认 | 说明 |
 |---|---|---|
 | enabled | true | 总开关 |
+| recycle | true | true = 自动把 ZIP 投进回收站；false = 只留在 outbox 供审阅 |
 | dataDir | 空 | 空 = 工作区所在卷根下的 .dsh-lajibuluodi；跨卷时自动退化为复制 |
 | exclude | 常见构建/依赖目录 | 不参与快照的路径；支持目录名、*、?、a/b 前缀 |
 | maxFiles | 20000 | 单轮最多快照的文件数，超出会截断并告警 |
@@ -138,6 +146,15 @@ restore 会：
 | keepSnapshots | false | 打包后保留快照（调试用） |
 | packagePrefix | DSH | 包名前缀 |
 | packageNameMaxLength | 120 | 包名最大长度 |
+
+## 安全边界
+
+- 插件**不会主动删除**工作区里的任何文件；它只处理本轮结束时已经消失的文件。
+- 它**不会清空回收站**，也不会修改回收站里已有的条目；每轮最多新增一个 ZIP。
+- 默认每个非空轮次自动投递；想先审阅就把 `recycle` 设为 `false`，包留在 outbox。
+- 它无法区分“谁”删除了文件：本轮中用户、其他进程或其他 agent 删除的文件也会被捕获。
+- 同一工作区有多个 agent 并发运行时，一个轮次的快照可能捕获相邻会话的删除；需要严格隔离时请给每个 agent 独立工作区。
+- 快照失败、文件数/大小超限时，只会少打包或不打包，不会误删文件。
 
 ## 限制与注意事项
 

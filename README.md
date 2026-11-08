@@ -11,7 +11,7 @@ This workspace contains the **DSH-lajibuluodi** plugin: one recognizable Recycle
 
 ## Status
 
-- 11 unit/integration tests pass.
+- 12 unit/integration tests pass.
 - Verified in a real DSH headless profile with a mock Messages API: the agent deleted a file, the plugin produced one ZIP in the E: Recycle Bin, and /lajibuluodi restore restored the file.
 - The running desktop profile was not modified.
 

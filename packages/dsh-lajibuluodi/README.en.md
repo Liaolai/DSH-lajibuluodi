@@ -69,7 +69,7 @@ then add dsh-lajibuluodi to that profile the same way.
 
 ## Usage
 
-Fully automatic. No model tool is required.
+Fully automatic. No model tool is required. To review before anything reaches the Recycle Bin, set `recycle: false`: the ZIP stays in the outbox, `/lajibuluodi list` shows it, and you can delete it manually later or `restore` from it.
 
 ~~~
 /lajibuluodi status            active capture, data root, last package
@@ -82,6 +82,13 @@ Fully automatic. No model tool is required.
 restore uses the outbox ZIP if it is still there; otherwise it locates the $R... payload in $Recycle.Bin by the original outbox path, extracts it, and writes the files back according to manifest.json.
 
 Explorer's “Restore” on the ZIP only puts the ZIP back into the outbox; use the command above to restore its contents.
+
+## Compatibility / other agents
+
+- **Other DSH agents/sessions**: the plugin is host-level. Install it into a profile and every top-level session benefits automatically; no per-agent wiring.
+- **DSH subagents**: deletions in the same workspace are folded into the parent turn's package; the plugin skips subagent turns to avoid duplicate packages. A subagent running in a **different cwd** (for example its own worktree) is not captured.
+- **Other agent frameworks** (Claude Code, Codex, WorkBuddy, Cursor, ...): **not usable as-is**. They do not emit DSH turn events, so this plugin cannot see their deletions; existing WorkBuddy Recycle Bin entries are not cleaned.
+- **Other DSH profiles**: install per profile; every DSH agent in that profile then shares the behavior.
 
 ## Configuration
 
@@ -100,6 +107,7 @@ Override by row id in the profile's cordis.patch.yml:
 | Key | Default | Meaning |
 |---|---|---|
 | enabled | true | master switch |
+| recycle | true | true = hand the ZIP to the Recycle Bin; false = keep it in the outbox for review |
 | dataDir | empty | empty = volume root/.dsh-lajibuluodi; cross-volume falls back to copy mode |
 | exclude | common build/dependency dirs | paths skipped by the snapshot; directory names, *, ?, a/b prefixes |
 | maxFiles | 20000 | snapshot file cap per turn |
@@ -111,6 +119,15 @@ Override by row id in the profile's cordis.patch.yml:
 | keepSnapshots | false | keep snapshots after packaging (debug) |
 | packagePrefix | DSH | package name prefix |
 | packageNameMaxLength | 120 | package name cap |
+
+## Safety boundaries
+
+- The plugin never deletes a live workspace file. It only processes files that are already gone at turn end.
+- It never empties or edits the Recycle Bin. One turn adds at most one ZIP.
+- Every non-empty turn is automatic by default; set `recycle: false` to keep packages in the outbox for review.
+- It cannot tell who deleted a file: a deletion by the user, another process, or another agent during the same turn is captured too.
+- With multiple agents sharing one workspace, a turn snapshot may capture a neighbouring session's deletion. Use one workspace per agent when strict isolation matters.
+- If a snapshot fails or caps are exceeded, it packages less or nothing; it never deletes extra files.
 
 ## Limitations
 

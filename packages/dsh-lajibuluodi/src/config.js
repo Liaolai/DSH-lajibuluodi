@@ -4,6 +4,7 @@ import { DEFAULT_EXCLUDES } from './options.js'
 /** Loader-facing configuration schema. */
 export const Config = z.object({
   enabled: z.boolean().default(true),
+  recycle: z.boolean().default(true),
   dataDir: z.string().default(''),
   exclude: z.array(z.string()).default([...DEFAULT_EXCLUDES]),
   maxFiles: z.number().default(20_000),
