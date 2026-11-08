@@ -1,5 +1,7 @@
 # DSH-lajibuluodi workspace
 
+[![test](https://github.com/Liaolai/DSH-lajibuluodi/actions/workflows/test.yml/badge.svg)](https://github.com/Liaolai/DSH-lajibuluodi/actions/workflows/test.yml)
+
 This workspace contains the **DSH-lajibuluodi** plugin: one recognizable Recycle Bin package per DSH agent turn.
 
 - Package: [packages/dsh-lajibuluodi](packages/dsh-lajibuluodi)
