@@ -1,0 +1,4 @@
+# DSH-lajibuluodi bundle patch: mount the per-turn trash packager.
+- insert:
+    - id: lajibuluodi
+      name: dsh-lajibuluodi

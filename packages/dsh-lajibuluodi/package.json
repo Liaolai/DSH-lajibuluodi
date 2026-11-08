@@ -1,0 +1,50 @@
+{
+  "name": "dsh-lajibuluodi",
+  "version": "0.1.0",
+  "description": "Package each DSH turn's discarded files into one recognizable Recycle Bin entry.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liaolai/DSH-lajibuluodi.git",
+    "directory": "packages/dsh-lajibuluodi"
+  },
+  "homepage": "https://github.com/Liaolai/DSH-lajibuluodi#readme",
+  "bugs": {
+    "url": "https://github.com/Liaolai/DSH-lajibuluodi/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "recycle-bin",
+    "trash",
+    "agent"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/schemastery": "^3.18.1"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

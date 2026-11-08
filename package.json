@@ -1,0 +1,8 @@
+{
+  "name": "dsh-lajibuluodi-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"packages/dsh-lajibuluodi/test/*.test.js\""
+  }
+}

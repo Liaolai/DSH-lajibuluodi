@@ -1,0 +1,9 @@
+node_modules/
+.research/
+test-output/
+*.log
+*.tgz
+.env
+NOTES.md
+.DS_Store
+Thumbs.db
